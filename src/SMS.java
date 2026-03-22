@@ -1,7 +1,7 @@
-import java.sql.SQLOutput;
 import java.util.*;
+import java.io.*;
 
-class Students{
+class Students implements Serializable{
     int id;
     String name;
     String course;
@@ -9,8 +9,30 @@ class Students{
     char grade;
 }
 public class SMS{
+    private static final String FILE_NAME = "students.dat";
+
+    public static void saveData(ArrayList<Students> studentsData){
+        try(ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream("students.dat"))){
+            oos.writeObject(studentsData);
+            System.out.println("Data Saved successfully");
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    public static ArrayList<Students> loadData(){
+        ArrayList<Students> studentsData=new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            studentsData = (ArrayList<Students>) ois.readObject();
+            System.out.println("Data loaded successfully!");
+        } catch (FileNotFoundException e) {
+            System.out.println("No saved data found, starting fresh.");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return studentsData;
+    }
     public static void main(String[] args) {
-        ArrayList<Students> studentsData = new ArrayList<>();
+        ArrayList<Students> studentsData = loadData();
         Scanner sc = new Scanner(System.in);
         while(true) {
             System.out.println("1. Add Students");
@@ -113,6 +135,7 @@ public class SMS{
                 }
             }
             else if(choice==6){
+                saveData(studentsData);
                 break;
             }
             else{
